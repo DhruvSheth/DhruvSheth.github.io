@@ -1,3 +1,13 @@
 body, input, textarea, button {
     font-family: 'Courier New', monospace;
 }
+
+canvas {
+    border: none;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
