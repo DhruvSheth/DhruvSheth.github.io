@@ -32,6 +32,12 @@ const platform2 = {
     startX: 200,
     endX: 600
 };
+const coin = {
+    posX: 300,
+    posY: 300,
+    width: 30,
+    height: 30
+};
 const endZone = {
     posX: windowWidth - 240,
     posY: halfWindowHeight,
@@ -40,14 +46,31 @@ const endZone = {
 };
 const level = {
     platforms: [platform, platform2],
+    coins: [coin],
     player,
     endZone
 };
-let drawLevel = ({ player, endZone, platforms }) => {
+const initalCoinCount = level.coins.length;
+let drawLevel = ({ player, endZone, platforms, coins }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawScore();
     drawPlayer(player);
     drawEndzone(endZone);
+    coins.forEach((coin) => drawCoin(coin));
     platforms.forEach((platform) => drawPlatform(platform));
+};
+let drawScore = () => {
+    const scoreHorizontalOffset = 10;
+    const scoreMaxWidth = windowWidth - (scoreHorizontalOffset * 2);
+    const fontSize = 50;
+    ctx.fillStyle = "black";
+    ctx.font = `${fontSize}px Courier New`;
+    var scoreString = `${level.coins.length} coins left out of ${initalCoinCount}`;
+    ctx.strokeText(scoreString, scoreHorizontalOffset, fontSize, scoreMaxWidth);
+};
+let drawCoin = (coin) => {
+    ctx.fillStyle = "gold";
+    ctx.fillRect(coin.posX, coin.posY, coin.width, coin.height);
 };
 let drawPlatform = (platform) => {
     ctx.fillStyle = "black";

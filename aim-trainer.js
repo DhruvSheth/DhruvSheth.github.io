@@ -46,7 +46,7 @@ function displayScore() {
     ctx.fillStyle = "black";
     ctx.font = `${fontSize}px Courier New`;
     var scoreString = `${targetsClickedCount} targets clicked in ${clickCount} clicks`;
-    ctx.strokeText  (scoreString, scoreHorizontalOffset, fontSize, scoreMaxWidth);
+    ctx.strokeText(scoreString, scoreHorizontalOffset, fontSize, scoreMaxWidth);
 }
 
 // we need to be able to draw circles as targets

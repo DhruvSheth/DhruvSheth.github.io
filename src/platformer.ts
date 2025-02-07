@@ -1,3 +1,4 @@
+import { Coin } from "./data/Coins";
 import { Entity } from "./data/Entity";
 import { Level } from "./data/Level";
 import { Platform } from "./data/Platform";
@@ -44,6 +45,12 @@ const platform2: Platform = {
     endX: 600
 }
 
+const coin: Coin = {
+    posX: 300,
+    posY: 300,
+    width: 30,
+    height: 30
+}
 const endZone: Entity = {
     posX: windowWidth - 240,
     posY: halfWindowHeight,
@@ -53,17 +60,36 @@ const endZone: Entity = {
 
 const level: Level = {
     platforms: [platform, platform2],
+    coins: [coin],
     player,
     endZone
 }
 
+const initalCoinCount = level.coins.length;
 
-let drawLevel = ({ player, endZone, platforms }: Level) => {
+let drawLevel = ({ player, endZone, platforms, coins }: Level) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawScore()
     drawPlayer(player)
     drawEndzone(endZone)
+    coins.forEach((coin) => drawCoin(coin))
     platforms.forEach((platform) => drawPlatform(platform))
 
+}
+
+let drawScore = () => {
+    const scoreHorizontalOffset = 10;
+    const scoreMaxWidth = windowWidth - (scoreHorizontalOffset* 2)
+    const fontSize = 50;
+    ctx.fillStyle = "black";
+    ctx.font = `${fontSize}px Courier New`;
+    var scoreString = `${level.coins.length} coins left out of ${initalCoinCount}`;
+    ctx.strokeText(scoreString, scoreHorizontalOffset, fontSize, scoreMaxWidth);
+}
+
+let drawCoin = (coin: Coin) => {
+    ctx.fillStyle = "gold";
+    ctx.fillRect(coin.posX, coin.posY, coin.width, coin.height);
 }
 
 let drawPlatform = (platform: Platform) => {
