@@ -1,28 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var canvas = document.getElementById("platformerCanvas");
+const canvas = document.getElementById("platformerCanvas");
 if (!(canvas instanceof HTMLCanvasElement)) {
     throw new Error("Element is not a canvas");
 }
-var ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 if (!ctx) {
     throw new Error("Failed to get 2D context");
 }
-var windowWidth = window.innerWidth;
-var windowHeight = window.innerHeight;
-var halfWindowHeight = window.innerHeight / 2;
+let windowWidth = window.innerWidth;
+let windowHeight = window.innerHeight;
+let halfWindowHeight = window.innerHeight / 2;
 canvas.width = windowWidth;
 canvas.height = windowHeight;
-// we want to respect the size of the window
-function handleResize() {
-}
-window.addEventListener('resize', handleResize);
-// hello world
-ctx.fillStyle = "black";
-ctx.font = "50px Courier New";
-var helloWorld = "Hello World!";
-ctx.strokeText(helloWorld, 10, 50);
-var player = {
+const player = {
     momentumX: 0,
     momentumY: 0,
     posX: 60,
@@ -30,39 +21,74 @@ var player = {
     width: 30,
     height: 60
 };
-var platform = {
+const platform = {
     height: halfWindowHeight + 60,
     startX: 0,
     endX: windowWidth
 };
-var endZone = {
+const endZone = {
     posX: windowWidth - 240,
     posY: halfWindowHeight,
     width: 240,
     height: 120
 };
-var level = {
+const level = {
     platforms: [platform],
-    player: player,
-    endZone: endZone
+    player,
+    endZone
 };
-var drawLevel = function (_a) {
-    var player = _a.player, endZone = _a.endZone, platforms = _a.platforms;
+let drawLevel = ({ player, endZone, platforms }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer(player);
     drawEndzone(endZone);
-    platforms.forEach(function (platform) { return drawPlatform(platform); });
+    platforms.forEach((platform) => drawPlatform(platform));
 };
-var drawPlatform = function (platform) {
+let drawPlatform = (platform) => {
     ctx.fillStyle = "black";
     ctx.fillRect(platform.startX, platform.height, platform.endX - platform.startX, 20);
 };
-var drawPlayer = function (player) {
+let drawPlayer = (player) => {
     ctx.fillStyle = "grey";
     ctx.fillRect(player.posX, player.posY, player.width, player.height);
 };
-var drawEndzone = function (endZone) {
+let drawEndzone = (endZone) => {
     ctx.fillStyle = "green";
     ctx.fillRect(endZone.posX, endZone.posY - (endZone.height / 2), endZone.width, endZone.height);
 };
+var Direction;
+(function (Direction) {
+    Direction[Direction["Up"] = 0] = "Up";
+    Direction[Direction["Down"] = 1] = "Down";
+    Direction[Direction["Left"] = 2] = "Left";
+    Direction[Direction["Right"] = 3] = "Right";
+})(Direction || (Direction = {}));
+let handleMovement = (dir) => {
+    console.log(dir);
+    switch (dir) {
+        case Direction.Up:
+            break;
+        case Direction.Down:
+            break;
+        case Direction.Left:
+            level.player.posX -= player.width;
+            break;
+        case Direction.Right:
+            level.player.posX += player.width;
+            break;
+    }
+};
+const arrowPrefix = "Arrow";
+let handleArrowKeys = (arrowPress) => {
+    let cleanedPressString = arrowPress.slice(arrowPrefix.length);
+    const enumValue = cleanedPressString;
+    handleMovement(Direction[enumValue]);
+};
+document.addEventListener('keydown', (event) => {
+    console.log('Keydown event:', event.key, event.code);
+    if (event.key.startsWith(arrowPrefix)) {
+        handleArrowKeys(event.key);
+    }
+    console.log(level);
+    drawLevel(level);
+});
 drawLevel(level);

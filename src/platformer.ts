@@ -23,19 +23,6 @@ canvas.width = windowWidth;
 canvas.height = windowHeight;
 
 
-// we want to respect the size of the window
-function handleResize() {
-}
-  
-window.addEventListener('resize', handleResize);
-
-// hello world
-ctx.fillStyle = "black";
-ctx.font = `50px Courier New`;
-const helloWorld = `Hello World!`;
-ctx.strokeText(helloWorld, 10, 50);
-
-
 const player: Player = {
     momentumX: 0,
     momentumY: 0,
@@ -91,6 +78,47 @@ let drawEndzone = (endZone: Entity) => {
 
     ctx.fillRect(endZone.posX, endZone.posY - (endZone.height / 2), endZone.width, endZone.height);
 }
+
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+  }
+
+let handleMovement = (dir: Direction) => {
+    console.log(dir)
+    switch(dir) {
+        case Direction.Up:
+            break;
+        case Direction.Down:
+            break;
+        case Direction.Left:
+            level.player.posX -= player.width;
+            break;
+        case Direction.Right:
+            level.player.posX += player.width;
+            break;
+    }
+}
+
+const arrowPrefix = "Arrow"
+
+let handleArrowKeys = (arrowPress: String) => {
+    let cleanedPressString = arrowPress.slice(arrowPrefix.length)
+    const enumValue = cleanedPressString as keyof typeof Direction;
+    handleMovement(Direction[enumValue])
+}
+
+
+document.addEventListener('keydown', (event) => {
+    console.log('Keydown event:', event.key, event.code);
+    if (event.key.startsWith(arrowPrefix)) {
+        handleArrowKeys(event.key);
+    }
+    console.log(level)
+    drawLevel(level);
+});
 
 
 drawLevel(level);
