@@ -29,13 +29,19 @@ const player: Player = {
     posX: 60,
     posY: halfWindowHeight,
     width: 30,
-    height: 60
+    height: 60,
+    hasDoubleJump: true
 }
 
 const platform: Platform = {
-    height: halfWindowHeight + 60,
+    height: halfWindowHeight,
     startX: 0,
     endX: windowWidth
+}
+const platform2: Platform = {
+    height: halfWindowHeight - 100,
+    startX: 200,
+    endX: 600
 }
 
 const endZone: Entity = {
@@ -46,7 +52,7 @@ const endZone: Entity = {
 }
 
 const level: Level = {
-    platforms: [platform],
+    platforms: [platform, platform2],
     player,
     endZone
 }
@@ -62,7 +68,7 @@ let drawLevel = ({ player, endZone, platforms }: Level) => {
 
 let drawPlatform = (platform: Platform) => {
     ctx.fillStyle = "black";
-    ctx.fillRect(platform.startX, platform.height, platform.endX - platform.startX, 20);
+    ctx.fillRect(platform.startX, platform.height + 60, platform.endX - platform.startX, 20);
 
 }
 
@@ -90,14 +96,21 @@ let handleMovement = (dir: Direction) => {
     console.log(dir)
     switch(dir) {
         case Direction.Up:
+            if (isPlayerGrounded(level)) {
+                level.player.momentumY = -30;
+                level.player.hasDoubleJump = true;
+            } else if (level.player.hasDoubleJump) {
+                level.player.momentumY -= 30;
+                level.player.hasDoubleJump = false;
+            }
             break;
         case Direction.Down:
             break;
         case Direction.Left:
-            level.player.posX -= player.width;
+            level.player.momentumX = -15;
             break;
         case Direction.Right:
-            level.player.posX += player.width;
+            level.player.momentumX = 15;
             break;
     }
 }
@@ -117,8 +130,62 @@ document.addEventListener('keydown', (event) => {
         handleArrowKeys(event.key);
     }
     console.log(level)
-    drawLevel(level);
 });
 
 
-drawLevel(level);
+let isPlayerHorizontallyOnPlatform = (platform: Platform, player: Player): boolean => {
+    return platform.startX < player.posX && platform.endX > player.posX;
+}
+
+
+let isPlayerGrounded = (level: Level): boolean => {
+    return level.platforms.some(platform => platform.height == player.posY && isPlayerHorizontallyOnPlatform(platform, player))
+}
+
+// return the height of the platform the player is passing in the next tick, else -1
+let heightOfGroundPlayerIsPassing = (level: Level): number => {
+    let aboveBeforeTick = level.platforms.map(platform => platform.height > player.posY && isPlayerHorizontallyOnPlatform(platform, player));
+    let aboveAfterTick = level.platforms.map(platform => platform.height > player.posY + player.momentumY && isPlayerHorizontallyOnPlatform(platform, player));
+    for (let i = 0; i < level.platforms.length; i += 1) {
+        if (aboveBeforeTick[i] && !aboveAfterTick[i]) {
+            return level.platforms[i].height;
+        }
+    }
+    return -1;
+}
+
+let handleMomentum = (level: Level) => {
+    let momX = level.player.momentumX;
+    let momY = level.player.momentumY;
+    level.player.posX += momX;
+    level.player.posY += momY;
+
+
+    if (momX < 0) {
+        level.player.momentumX += 1;
+    } else if (momX > 0) {
+        level.player.momentumX -= 1;
+    }
+    let passingGround = heightOfGroundPlayerIsPassing(level)
+    
+    if (isPlayerGrounded(level)) {
+        level.player.momentumY = 0;
+
+    } else if (passingGround > -1) {
+        level.player.momentumY = 0;
+        level.player.posY = passingGround;
+    }
+    else {
+        level.player.momentumY += 3;
+    }
+
+}
+
+
+let gameLoop = () => {
+    drawLevel(level);
+    handleMomentum(level);
+    requestAnimationFrame(gameLoop)
+}
+
+gameLoop();
