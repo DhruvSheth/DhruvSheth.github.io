@@ -167,9 +167,18 @@ let handleMomentum = (level) => {
         level.player.momentumY += 3;
     }
 };
+let doEntitiesOverlap = (ent1, ent2) => {
+    let horizCollisionSize = ent1.width + ent2.width;
+    let vertCollisionSize = ent1.height + ent2.height;
+    return Math.abs(ent1.posX - ent2.posX) < horizCollisionSize && Math.abs(ent1.posY - ent2.posY) < vertCollisionSize;
+};
+let handleCheckCoins = (level) => {
+    level.coins = level.coins.filter((coin) => !doEntitiesOverlap(coin, level.player));
+};
 let gameLoop = () => {
     drawLevel(level);
     handleMomentum(level);
+    handleCheckCoins(level);
     requestAnimationFrame(gameLoop);
 };
 gameLoop();

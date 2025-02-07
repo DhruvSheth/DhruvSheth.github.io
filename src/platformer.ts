@@ -100,14 +100,12 @@ let drawPlatform = (platform: Platform) => {
 
 let drawPlayer = (player: Player) => {
     ctx.fillStyle = "grey";
-
     ctx.fillRect(player.posX, player.posY, player.width, player.height);
 
 }
 
 let drawEndzone = (endZone: Entity) => {
     ctx.fillStyle = "green";
-
     ctx.fillRect(endZone.posX, endZone.posY - (endZone.height / 2), endZone.width, endZone.height);
 }
 
@@ -207,10 +205,20 @@ let handleMomentum = (level: Level) => {
 
 }
 
+let doEntitiesOverlap = (ent1: Entity, ent2: Entity): boolean => {
+    let horizCollisionSize = ent1.width + ent2.width;
+    let vertCollisionSize = ent1.height + ent2.height;
+    return Math.abs(ent1.posX - ent2.posX) < horizCollisionSize && Math.abs(ent1.posY - ent2.posY) < vertCollisionSize;
+}
+
+let handleCheckCoins = (level: Level) => {
+    level.coins = level.coins.filter((coin) => !doEntitiesOverlap(coin, level.player));
+}
 
 let gameLoop = () => {
     drawLevel(level);
     handleMomentum(level);
+    handleCheckCoins(level);
     requestAnimationFrame(gameLoop)
 }
 
